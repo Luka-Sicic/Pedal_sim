@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "author": "Anonymous maker",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "wokwi-breadboard-half", "id": "bb1", "top": 93, "left": -352.4, "attrs": {} },
+    { "type": "board-st-nucleo-c031c6", "id": "nucleo", "top": 0.83, "left": -0.98, "attrs": {} },
+    { "type": "wokwi-potentiometer", "id": "pot1", "top": 17.9, "left": -221, "attrs": {} },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn1",
+      "top": 191.9,
+      "left": -102.1,
+      "rotate": 90,
+      "attrs": { "color": "green", "xray": "1", "bounce": "1" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led1",
+      "top": 102,
+      "left": -130.6,
+      "attrs": { "color": "red", "flip": "" }
+    }
+  ],
+  "connections": [
+    [ "$serialMonitor:TX", "nucleo:PA3", "", [] ],
+    [ "$serialMonitor:RX", "nucleo:PA2", "", [] ],
+    [ "nucleo:PA4", "btn1:1.r", "green", [ "h0" ] ],
+    [ "pot1:SIG", "nucleo:PA1", "green", [ "v0" ] ],
+    [ "led1:A", "nucleo:PA0", "green", [ "v0" ] ],
+    [ "led1:C", "bb1:29t.d", "black", [ "v0" ] ],
+    [ "pot1:GND", "bb1:29t.c", "black", [ "v0" ] ],
+    [ "bb1:29t.b", "nucleo:GND.2", "black", [ "v0" ] ],
+    [ "pot1:VCC", "bb1:27t.b", "red", [ "v0" ] ],
+    [ "btn1:1.l", "bb1:29t.e", "", [ "$bb" ] ],
+    [ "btn1:2.l", "bb1:27t.e", "", [ "$bb" ] ],
+    [ "btn1:1.r", "bb1:29b.j", "", [ "$bb" ] ],
+    [ "btn1:2.r", "bb1:27b.j", "", [ "$bb" ] ],
+    [ "led1:A", "bb1:24t.a", "", [ "$bb" ] ],
+    [ "led1:C", "bb1:23t.a", "", [ "$bb" ] ],
+    [ "nucleo:3V3.2", "bb1:27t.a", "red", [ "h-57.15", "v-48" ] ]
+  ],
+  "dependencies": {}
+}
