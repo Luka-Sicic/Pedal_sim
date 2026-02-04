@@ -57,7 +57,7 @@ static void MX_ADC1_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 uint32_t currentTime, previousTime = 0, displayTime = 0;
-char* mappingMode = "Linear";
+uint8_t isLinear = 1, buttonState = 0, lastButtonState = 0;
 
 int map_linear(int variable, int min_fm, int max_fm, int min_to, int max_to){
   float percentage = (variable - min_fm)/(float)(max_fm - min_fm); 
@@ -116,14 +116,27 @@ int main(void)
     /* USER CODE BEGIN 3 */
 	  currentTime = HAL_GetTick();
 
-    if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_4) && (currentTime - previousTime > 500)){
-	  	if(mappingMode == "Linear"){
-        mappingMode = "Progressive";
-        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, SET);
-      } 
+    if(isLinear == 0){
+      HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, SET);
+    }
+    else{
+      HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, RESET);
+    } 
+
+    if(currentTime - previousTime > 5){
+
+	  	uint8_t reading = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_4);
+      
+      if(reading != lastButtonState){
+        lastButtonState = reading;
+      }
 	  	else{
-        mappingMode = "Linear";
-        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, RESET);
+        if(reading != buttonState){
+          buttonState = reading;
+          if (buttonState == GPIO_PIN_RESET){
+            isLinear = (isLinear == 1) ? 0 : 1;
+          }
+        }
       } 
 	  	previousTime = currentTime;
 	  }
@@ -132,7 +145,7 @@ int main(void)
     HAL_ADC_PollForConversion(&hadc1, 100);
     int pedal = map_linear(HAL_ADC_GetValue(&hadc1),0,4090,0,100);
     int output = 0;
-    if(mappingMode == "Linear"){
+    if(isLinear){
       output = map_linear(HAL_ADC_GetValue(&hadc1),0,4090,0,100);
     }
     else{
@@ -140,7 +153,8 @@ int main(void)
     }
 
     if(currentTime - displayTime > 500){
-      printf("Pedal: %d | Map: %s | Output: %d \n", pedal,mappingMode,output);
+      char* s = (isLinear == 1) ? "Linear" : "Progressive";
+      printf("Pedal: %d | Map: %s | Output: %d \n", pedal,s,output);
       displayTime = currentTime;
     }
   }
